@@ -1,11 +1,18 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/MisterEskere/Streaming-Gommunity/src/engines"
 	"github.com/MisterEskere/Streaming-Gommunity/src/tmdb"
 )
+
+type StreamingSource struct {
+	Service string
+	Link    string
+	Type    string
+}
 
 // TrendingMoviesHandler handles the request for trending movies of the day
 // Note: This function now returns http.HandlerFunc to capture the TmdbClient
@@ -51,4 +58,19 @@ func TrendingSeriesHandler(TmdbClient *tmdb.Client) http.HandlerFunc {
 		}
 		// No return statement needed here for w and r
 	}
+}
+
+// Return the streaming URLs of the requested movie (later on implement series)
+func GetStreamingLinksHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract the query parameters needed to find the correct element on the streaming sites
+	queryParams := r.URL.Query()
+	Slug := queryParams.Get("Slug")
+
+	engines.GetStreamingCommunityLink(Slug)
 }
